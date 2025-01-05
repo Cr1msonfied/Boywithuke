@@ -1,275 +1,159 @@
-<html><head><base href="/" /><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MP3 Directory Player</title>
-<style>
-    body {
-        font-family: 'Arial', sans-serif;
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-        background: #1a1a1a;
-        color: #fff;
-    }
-    
-    .player-container {
-        background: #2d2d2d;
-        border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    
-    .track-list {
-        list-style: none;
-        padding: 0;
-    }
-    
-    .track-item {
-        background: #3d3d3d;
-        margin: 10px 0;
-        padding: 15px;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-    
-    .track-item:hover {
-        background: #4d4d4d;
-    }
-    
-    .track-item.playing {
-        background: #5d5d5d;
-        border-left: 4px solid #1db954;
-    }
-    
-    .controls {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    }
-    
-    .play-btn {
-        background: #1db954;
-        border: none;
-        color: white;
-        padding: 8px 16px;
-        border-radius: 20px;
-        cursor: pointer;
-        transition: transform 0.2s ease;
-    }
-    
-    .play-btn:hover {
-        transform: scale(1.05);
-    }
-    
-    #now-playing {
-        text-align: center;
-        margin: 20px 0;
-        font-size: 1.2em;
-        color: #1db954;
-    }
-    
-    .progress-container {
-        width: 100%;
-        height: 5px;
-        background: #4d4d4d;
-        border-radius: 5px;
-        margin: 10px 0;
-        cursor: pointer;
-    }
-    
-    .progress-bar {
-        height: 100%;
-        background: #1db954;
-        border-radius: 5px;
-        width: 0%;
-        transition: width 0.1s linear;
-    }
-    
-    .time-display {
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.8em;
-        color: #888;
-    }
-</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BWUSongs - BoyWithUke</title>
+  <style>
+    /* Styling omitted for brevity (use your existing styles from the uploaded HTML file) */
+  </style>
 </head>
 <body>
-    <div class="player-container">
-        <h1>MP3 Directory Player</h1>
-        <div id="now-playing">No track selected</div>
-        <div class="progress-container" id="progress-container">
-            <div class="progress-bar" id="progress-bar"></div>
-        </div>
-        <div class="time-display">
-            <span id="current-time">0:00</span>
-            <span id="duration">0:00</span>
-        </div>
-        <div class="controls">
-            <button class="play-btn" id="prev-btn">⏮️</button>
-            <button class="play-btn" id="play-btn">▶️</button>
-            <button class="play-btn" id="next-btn">⏭️</button>
-            <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
-        </div>
+  <nav class="sidebar">
+    <a href="#" class="logo-text">BWUSongs</a>
+    <input type="file" id="uploadMp3" accept=".mp3" style="display: none;">
+    <button class="upload-btn" onclick="document.getElementById('uploadMp3').click()">Upload MP3</button>
+  </nav>
+
+  <main class="main-content">
+    <div class="artist-header">
+      <div class="artist-image">
+        <img src="/channels4_profile.jpg" alt="BoyWithUke profile picture" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+      </div>
+      <div class="artist-info">
+        <h1>BoyWithUke</h1>
+        <p class="stats">Monthly Listeners: 12,543,789</p>
+      </div>
     </div>
-    
-    <ul class="track-list" id="track-list">
-        <!-- Tracks will be populated here -->
-    </ul>
 
-<script>
-class AudioPlayer {
-    constructor() {
-        this.tracks = [];
-        this.currentTrackIndex = 0;
-        this.isPlaying = false;
-        this.audio = new Audio();
-        
-        this.initializeElements();
-        this.setupEventListeners();
-        this.loadTracks();
+    <div class="popular-tracks">
+      <h2>Popular Tracks</h2>
+      <div class="track-list"></div>
+    </div>
+  </main>
+
+  <div class="player">
+    <div style="display: flex; align-items: center; gap: 15px;">
+      <div class="album-art" style="width: 60px;"></div>
+      <div>
+        <h4 id="currentTrack">No track selected</h4>
+        <p style="color: #ffcccc;">BoyWithUke</p>
+      </div>
+    </div>
+
+    <div class="player-controls">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" onclick="previousTrack()">
+        <path d="M13 2.5L5 7.119V3H3v10h2V8.881l8 4.619z"/>
+      </svg>
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" id="playPauseBtn" onclick="togglePlay()">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" onclick="nextTrack()">
+        <path d="M3 2.5L11 7.119V3h2v10h-2V8.881l-8 4.619z"/>
+      </svg>
+      <div class="progress-bar" onclick="seekTo(event)">
+        <div class="progress" id="progressBar"></div>
+      </div>
+    </div>
+
+    <div class="volume-control">
+      <div class="progress-bar" style="width: 100px;" onclick="setVolume(event)">
+        <div class="progress" id="volumeBar"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const audioPlayer = document.getElementById('audioPlayer');
+    const progressBar = document.getElementById('progressBar');
+    const volumeBar = document.getElementById('volumeBar');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const currentTrackDisplay = document.getElementById('currentTrack');
+    let isPlaying = false;
+    let tracks = [];
+    let currentTrackIndex = 0;
+
+    async function fetchMp3Files() {
+      const repoUrl = "https://api.github.com/repos/Cr1msonfied/Boywithuke/contents/";
+      const response = await fetch(repoUrl);
+      const files = await response.json();
+
+      tracks = files
+        .filter(file => file.name.endsWith('.mp3'))
+        .map(file => ({
+          name: file.name.replace('.mp3', ''),
+          url: `https://cr1msonfied.github.io/Boywithuke/${file.name}`
+        }));
+
+      updateTrackList();
     }
-    
-    initializeElements() {
-        this.trackList = document.getElementById('track-list');
-        this.playBtn = document.getElementById('play-btn');
-        this.prevBtn = document.getElementById('prev-btn');
-        this.nextBtn = document.getElementById('next-btn');
-        this.progressBar = document.getElementById('progress-bar');
-        this.progressContainer = document.getElementById('progress-container');
-        this.currentTimeDisplay = document.getElementById('current-time');
-        this.durationDisplay = document.getElementById('duration');
-        this.nowPlaying = document.getElementById('now-playing');
-        this.volumeControl = document.getElementById('volume');
+
+    function updateTrackList() {
+      const trackList = document.querySelector('.track-list');
+      trackList.innerHTML = '';
+
+      tracks.forEach((track, index) => {
+        trackList.innerHTML += `
+          <div class="track-item" onclick="playTrack(${index})">
+            <span class="track-number">${index + 1}</span>
+            <div style="margin-left: 20px">
+              <h4>${track.name}</h4>
+            </div>
+          </div>
+        `;
+      });
     }
-    
-    setupEventListeners() {
-        this.playBtn.addEventListener('click', () => this.togglePlay());
-        this.prevBtn.addEventListener('click', () => this.playPrevious());
-        this.nextBtn.addEventListener('click', () => this.playNext());
-        this.volumeControl.addEventListener('input', (e) => this.setVolume(e.target.value));
-        
-        this.audio.addEventListener('timeupdate', () => this.updateProgress());
-        this.audio.addEventListener('ended', () => this.playNext());
-        this.progressContainer.addEventListener('click', (e) => this.seek(e));
-    }
-    
-    async loadTracks() {
-        try {
-            // This part assumes you're using GitHub Pages and have a way to list files
-            // You'll need to modify this based on your actual setup
-            const response = await fetch('.');
-            const text = await response.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(text, 'text/html');
-            const links = Array.from(doc.querySelectorAll('a'));
-            
-            this.tracks = links
-                .map(link => link.href)
-                .filter(href => href.toLowerCase().endsWith('.mp3'));
-            
-            this.renderTrackList();
-        } catch (error) {
-            console.error('Error loading tracks:', error);
-            this.trackList.innerHTML = '<li>Error loading tracks. Please check your connection.</li>';
-        }
-    }
-    
-    renderTrackList() {
-        this.trackList.innerHTML = this.tracks
-            .map((track, index) => {
-                const fileName = decodeURIComponent(track.split('/').pop());
-                return `
-                    <li class="track-item" data-index="${index}">
-                        <span>${fileName}</span>
-                        <span class="duration"></span>
-                    </li>
-                `;
-            })
-            .join('');
-            
-        this.trackList.querySelectorAll('.track-item').forEach(item => {
-            item.addEventListener('click', () => {
-                this.currentTrackIndex = parseInt(item.dataset.index);
-                this.playTrack();
-            });
-        });
-    }
-    
-    togglePlay() {
-        if (this.tracks.length === 0) return;
-        
-        if (this.isPlaying) {
-            this.audio.pause();
-            this.playBtn.textContent = '▶️';
+
+    function togglePlay() {
+      if (audioPlayer.src) {
+        if (isPlaying) {
+          audioPlayer.pause();
+          playPauseBtn.innerHTML = '<path d="M8 5v14l11-7z"/>';
         } else {
-            this.audio.play();
-            this.playBtn.textContent = '⏸️';
+          audioPlayer.play();
+          playPauseBtn.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
         }
-        this.isPlaying = !this.isPlaying;
+        isPlaying = !isPlaying;
+      }
     }
-    
-    playTrack() {
-        const previousTrack = this.trackList.querySelector('.playing');
-        if (previousTrack) previousTrack.classList.remove('playing');
-        
-        const currentTrack = this.tracks[this.currentTrackIndex];
-        this.audio.src = currentTrack;
-        this.audio.play();
-        this.isPlaying = true;
-        this.playBtn.textContent = '⏸️';
-        
-        const trackElement = this.trackList.querySelector(`[data-index="${this.currentTrackIndex}"]`);
-        trackElement.classList.add('playing');
-        
-        this.nowPlaying.textContent = `Now Playing: ${decodeURIComponent(currentTrack.split('/').pop())}`;
-    }
-    
-    playNext() {
-        if (this.tracks.length === 0) return;
-        this.currentTrackIndex = (this.currentTrackIndex + 1) % this.tracks.length;
-        this.playTrack();
-    }
-    
-    playPrevious() {
-        if (this.tracks.length === 0) return;
-        this.currentTrackIndex = (this.currentTrackIndex - 1 + this.tracks.length) % this.tracks.length;
-        this.playTrack();
-    }
-    
-    updateProgress() {
-        const duration = this.audio.duration;
-        const currentTime = this.audio.currentTime;
-        const progress = (currentTime / duration) * 100;
-        this.progressBar.style.width = `${progress}%`;
-        
-        this.currentTimeDisplay.textContent = this.formatTime(currentTime);
-        this.durationDisplay.textContent = this.formatTime(duration);
-    }
-    
-    formatTime(seconds) {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = Math.floor(seconds % 60);
-        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-    }
-    
-    seek(e) {
-        const width = this.progressContainer.clientWidth;
-        const clickX = e.offsetX;
-        const duration = this.audio.duration;
-        this.audio.currentTime = (clickX / width) * duration;
-    }
-    
-    setVolume(value) {
-        this.audio.volume = value;
-    }
-}
 
-// Initialize the player when the page loads
-window.addEventListener('load', () => {
-    new AudioPlayer();
-});
-</script>
-</body></html>
+    function playAudio() {
+      audioPlayer.play();
+      isPlaying = true;
+      playPauseBtn.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+    }
+
+    function playTrack(index) {
+      currentTrackIndex = index;
+      currentTrackDisplay.textContent = tracks[index].name;
+      audioPlayer.src = tracks[index].url;
+      playAudio();
+    }
+
+    function nextTrack() {
+      currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+      playTrack(currentTrackIndex);
+    }
+
+    function previousTrack() {
+      currentTrackIndex = (currentTrackIndex - 1 + tracks.length) % tracks.length;
+      playTrack(currentTrackIndex);
+    }
+
+    fetchMp3Files();
+
+    audioPlayer.addEventListener('timeupdate', () => {
+      const percent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+      progressBar.style.width = percent + '%';
+    });
+
+    audioPlayer.addEventListener('ended', () => {
+      isPlaying = false;
+      playPauseBtn.innerHTML = '<path d="M8 5v14l11-7z"/>';
+    });
+
+    audioPlayer.volume = 0.7;
+    volumeBar.style.width = '70%';
+  </script>
+</body>
+</html>
